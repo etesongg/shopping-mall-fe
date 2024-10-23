@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { showToastMessage } from "../common/uiSlice";
 import api from "../../utils/api";
 import { initialCart } from "../cart/cartSlice";
+import { act } from "react";
 
 export const loginWithEmail = createAsyncThunk(
   "user/loginWithEmail",
@@ -20,7 +21,33 @@ export const registerUser = createAsyncThunk(
   async (
     { email, name, password, navigate },
     { dispatch, rejectWithValue }
-  ) => {}
+  ) => {
+    try {
+      const response = await api.post("/user", { email, name, password });
+      // 성공
+      // 1. 성공 토스트 메시지 보여주기
+      dispatch(
+        showToastMessage({
+          message: "회원가입에 성공했습니다!",
+          status: "success",
+        })
+      );
+      // 2. 로그인 페이지 리다이렉트
+      navigate("/login");
+      return response.data.data;
+    } catch (e) {
+      // 실패
+      // 1. 실패 토스트 메시지 보여주기
+      dispatch(
+        showToastMessage({
+          message: "회원가입에 실패했습니다.",
+          status: "error",
+        })
+      );
+      // 2. 에러값 저장
+      return rejectWithValue(e.message);
+    }
+  }
 );
 
 export const loginWithToken = createAsyncThunk(
@@ -43,7 +70,19 @@ const userSlice = createSlice({
       state.registrationError = null;
     },
   },
-  extraReducers: (builder) => {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(registerUser.fulfilled, (state) => {
+        state.loading = false;
+        state.registrationError = null;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.registrationError = action.payload;
+      });
+  },
 });
 export const { clearErrors } = userSlice.actions;
 export default userSlice.reducer;
