@@ -7,7 +7,20 @@ import { act } from "react";
 
 export const loginWithEmail = createAsyncThunk(
   "user/loginWithEmail",
-  async ({ email, password }, { rejectWithValue }) => {}
+  async ({ email, password }, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/auth/login", { email, password });
+      console.log(response.data);
+      // 성공
+      // Loginpage
+
+      return response.data;
+    } catch (e) {
+      // 실패
+      // 실패시 생긴 에러값을 reducer에 저장
+      return rejectWithValue(e.message);
+    }
+  }
 );
 
 export const loginWithGoogle = createAsyncThunk(
@@ -73,14 +86,31 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(registerUser.pending, (state) => {
+        // 로딩중
         state.loading = true;
       })
       .addCase(registerUser.fulfilled, (state) => {
+        // 성공
         state.loading = false;
         state.registrationError = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
+        // 실패
         state.registrationError = action.payload;
+      })
+      .addCase(loginWithEmail.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(loginWithEmail.fulfilled, (state, action) => {
+        console.log("Login fulfilled:", action.payload);
+        state.loading = false;
+        state.user = action.payload.user; // action.payload = {success, token, user{_id, email, name, level} }
+        state.loginError = null;
+      })
+      .addCase(loginWithEmail.rejected, (state, action) => {
+        console.log("Login rejected:", action.payload);
+        state.loading = false;
+        state.loginError = action.payload;
       });
   },
 });
