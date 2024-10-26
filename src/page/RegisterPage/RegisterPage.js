@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Form, Button, Alert } from "react-bootstrap";
+import { Container, Form, Button, Alert, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 
@@ -19,7 +19,7 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const [passwordError, setPasswordError] = useState("");
   const [policyError, setPolicyError] = useState(false);
-  const { registrationError } = useSelector((state) => state.user);
+  const { registrationError, loading } = useSelector((state) => state.user); // redux에서 로딩 상태 가져오기
 
   const register = (event) => {
     event.preventDefault();
@@ -111,11 +111,19 @@ const RegisterPage = () => {
             id="policy"
             onChange={handleChange}
             isInvalid={policyError}
+            checked={formData.policy}
           />
         </Form.Group>
-        <Button variant="danger" type="submit">
-          회원가입
-        </Button>
+        {/* 로딩 중일 때 스피너 표시 */}
+        {loading ? (
+          <Spinner animation="border" role="status" variant="danger">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        ) : (
+          <Button variant="danger" type="submit">
+            회원가입
+          </Button>
+        )}
       </Form>
     </Container>
   );

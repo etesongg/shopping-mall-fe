@@ -93,6 +93,7 @@ const userSlice = createSlice({
         // 성공
         state.loading = false;
         state.registrationError = null;
+        state.success = true;
       })
       .addCase(registerUser.rejected, (state, action) => {
         // 실패
@@ -102,13 +103,11 @@ const userSlice = createSlice({
         state.loading = true;
       })
       .addCase(loginWithEmail.fulfilled, (state, action) => {
-        console.log("Login fulfilled:", action.payload);
         state.loading = false;
         state.user = action.payload.user; // action.payload = {success, token, user{_id, email, name, level} }
         state.loginError = null;
       })
       .addCase(loginWithEmail.rejected, (state, action) => {
-        console.log("Login rejected:", action.payload);
         state.loading = false;
         state.loginError = action.payload;
       });
