@@ -6,6 +6,7 @@ import { useNavigate } from "react-router";
 import "./style/register.style.css";
 
 import { registerUser } from "../../features/user/userSlice";
+import LoadingSpinner from "../../common/component/LoadingSpinner/LoadingSpinner";
 
 const RegisterPage = () => {
   const dispatch = useDispatch();
@@ -35,6 +36,8 @@ const RegisterPage = () => {
     }
     setPasswordError("");
     setPolicyError(false);
+
+    if (loading) return;
     dispatch(registerUser({ name, email, password, navigate }));
   };
 
@@ -49,6 +52,10 @@ const RegisterPage = () => {
       setFormData({ ...formData, [id]: value });
     }
   };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <Container className="register-area">
@@ -114,16 +121,9 @@ const RegisterPage = () => {
             checked={formData.policy}
           />
         </Form.Group>
-        {/* 로딩 중일 때 스피너 표시 */}
-        {loading ? (
-          <Spinner animation="border" role="status" variant="danger">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
-        ) : (
-          <Button variant="danger" type="submit">
-            회원가입
-          </Button>
-        )}
+        <Button variant="danger" type="submit">
+          회원가입
+        </Button>
       </Form>
     </Container>
   );
