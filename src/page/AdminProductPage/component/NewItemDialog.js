@@ -81,7 +81,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
 
   const addStock = () => {
     //재고타입 추가시 배열에 새 배열 추가
-    setStock([...stock, []]); // 기존에 배열에서 새로운 배열 추가
+    setStock([...stock, ["", "", Date.now()]]); // 기존에 배열에서 새로운 배열 추가
   };
 
   const deleteStock = (idx) => {
@@ -188,7 +188,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
           </Button>
           <div className="mt-2">
             {stock.map((item, index) => (
-              <Row key={index}>
+              <Row key={item[2]}>
                 <Col sm={4}>
                   <Form.Select
                     onChange={(event) =>
