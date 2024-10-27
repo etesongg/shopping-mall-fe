@@ -64,8 +64,12 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     //재고를 입력했는지 확인, 아니면 에러
+    if (stock.length === 0) return setStockError(true);
     // 재고를 배열에서 객체로 바꿔주기
-    // [['M',2]] 에서 {M:2}로
+    const totalStock = stock.reduce((total, item) => {
+      return { ...total, [item[0]]: parseInt(item[1]) };
+    }, {});
+    // [["s","3"],["m","4"]] => {s:3. m:4}
     if (mode === "new") {
       //새 상품 만들기
     } else {
@@ -89,7 +93,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
     const newStock = stock.filter((item, index) => index !== idx); // 내가 받아온 idx를 제외하고 다 보여줌
     setStock(newStock);
   };
-  console.log("stock", stock);
+
   const handleSizeChange = (value, index) => {
     //  재고 사이즈 변환하기
     // [[s,3],[m,4],[xl,5]]
@@ -106,6 +110,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
   };
 
   const onHandleCategory = (event) => {
+    // 카테고리가 이미 추가되어 있으면 제거
     if (formData.category.includes(event.target.value)) {
       const newCategory = formData.category.filter(
         (item) => item !== event.target.value
@@ -115,6 +120,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
         category: [...newCategory],
       });
     } else {
+      // 아니면 새로 추가
       setFormData({
         ...formData,
         category: [...formData.category, event.target.value],
@@ -124,6 +130,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
 
   const uploadImage = (url) => {
     //이미지 업로드
+    setFormData({ ...formData, image: url });
   };
 
   return (
