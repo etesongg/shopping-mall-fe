@@ -15,7 +15,7 @@ const ProductTable = ({ header, data, deleteItem, openEditForm }) => {
           </tr>
         </thead>
         <tbody>
-          {data.length > 0 ? (
+          {data && data.length > 0 ? (
             data.map((item, index) => (
               <tr key={index}>
                 <th>{index}</th>

@@ -5,7 +5,15 @@ import { showToastMessage } from "../common/uiSlice";
 // 비동기 액션 생성
 export const getProductList = createAsyncThunk(
   "products/getProductList",
-  async (query, { rejectWithValue }) => {}
+  async (query, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/product");
+      if (response.status !== 200) throw new Error(response.message);
+      return response.data.product;
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
+  }
 );
 
 export const getProductDetail = createAsyncThunk(
@@ -67,6 +75,7 @@ const productSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // 상품 생성
       .addCase(createProduct.pending, (state, action) => {
         // 로딩중
         state.loading = true;
@@ -75,13 +84,26 @@ const productSlice = createSlice({
         // 성공
         state.loading = false;
         state.error = "";
-        state.success = true; // 상품생성을 상공했으면 dialog를 닫고, 실패했으면 dialog에 보여주고 닫진 않음
+        state.success = true; // 상품생성을 성공했으면 dialog를 닫고, 실패했으면 dialog에 보여주고 닫진 않음
       })
       .addCase(createProduct.rejected, (state, action) => {
         // 실패
         state.loading = false;
         state.error = action.payload;
         state.success = false;
+      })
+      // 상품 리스트
+      .addCase(getProductList.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getProductList.fulfilled, (state, action) => {
+        state.loading = false;
+        state.productList = action.payload;
+        state.error = "";
+      })
+      .addCase(getProductList.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
