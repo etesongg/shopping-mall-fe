@@ -28,7 +28,6 @@ export const loginWithGoogle = createAsyncThunk(
   async (token, { rejectWithValue }) => {}
 );
 
-export const logout = () => (dispatch) => {};
 export const registerUser = createAsyncThunk(
   "user/registerUser",
   async (
@@ -75,6 +74,23 @@ export const loginWithToken = createAsyncThunk(
   }
 );
 
+export const logout = createAsyncThunk(
+  "user/logout",
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      sessionStorage.removeItem("token");
+      dispatch(
+        showToastMessage({
+          message: "로그아웃 되었습니다.",
+          status: "success",
+        })
+      );
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
+  }
+);
+
 const userSlice = createSlice({
   name: "user",
   initialState: {
@@ -92,6 +108,7 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // register 리듀서
       .addCase(registerUser.pending, (state) => {
         // 로딩중
         state.loading = true;
@@ -107,6 +124,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.registrationError = action.payload;
       })
+      // email login 리듀서
       .addCase(loginWithEmail.pending, (state) => {
         state.loading = true;
       })
@@ -119,8 +137,21 @@ const userSlice = createSlice({
         state.loading = false;
         state.loginError = action.payload;
       })
+      // token login 리듀서
       .addCase(loginWithToken.fulfilled, (state, action) => {
         state.user = action.payload.user;
+      })
+      // logout 리듀서
+      .addCase(logout.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.user = null;
+        state.loading = false;
+        state.success = false;
+      })
+      .addCase(logout.rejected, (state) => {
+        state.loading = false;
       });
   },
 });
