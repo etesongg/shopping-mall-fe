@@ -75,22 +75,34 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
 
   const handleChange = (event) => {
     //form에 데이터 넣어주기
+    const { id, value } = event.target;
+    setFormData({ ...formData, [id]: value });
   };
 
   const addStock = () => {
     //재고타입 추가시 배열에 새 배열 추가
+    setStock([...stock, []]); // 기존에 배열에서 새로운 배열 추가
   };
 
   const deleteStock = (idx) => {
     //재고 삭제하기
+    const newStock = stock.filter((item, index) => index !== idx); // 내가 받아온 idx를 제외하고 다 보여줌
+    setStock(newStock);
   };
-
+  console.log("stock", stock);
   const handleSizeChange = (value, index) => {
     //  재고 사이즈 변환하기
+    // [[s,3],[m,4],[xl,5]]
+    const newStock = [...stock];
+    newStock[index][0] = value;
+    setStock(newStock);
   };
 
   const handleStockChange = (value, index) => {
     //재고 수량 변환하기
+    const newStock = [...stock];
+    newStock[index][1] = value;
+    setStock(newStock);
   };
 
   const onHandleCategory = (event) => {
@@ -193,7 +205,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
                         inValid={true}
                         value={item.toLowerCase()}
                         disabled={stock.some(
-                          (size) => size[0] === item.toLowerCase()
+                          (size) => size[0] === item.toLowerCase() // 사이즈 중복 비활성화
                         )}
                         key={index}
                       >

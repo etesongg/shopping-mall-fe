@@ -52,8 +52,10 @@ const AdminProductPage = () => {
   };
 
   const handleClickNewItem = () => {
-    //new 모드로 설정하고
+    //new 모드로 설정하고 // 상품 생성과 수정을 같은 팝업을 써서 구별을 해주기 위해
+    setMode("new");
     // 다이얼로그 열어주기
+    setShowDialog(true);
   };
 
   const handlePageClick = ({ selected }) => {
