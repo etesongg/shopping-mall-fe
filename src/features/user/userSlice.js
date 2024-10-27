@@ -104,6 +104,7 @@ const userSlice = createSlice({
       })
       .addCase(registerUser.rejected, (state, action) => {
         // 실패
+        state.loading = false;
         state.registrationError = action.payload;
       })
       .addCase(loginWithEmail.pending, (state) => {

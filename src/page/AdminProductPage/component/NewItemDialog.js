@@ -33,7 +33,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
   const [stockError, setStockError] = useState(false);
 
   useEffect(() => {
-    if (success) setShowDialog(false);
+    if (success) setShowDialog(false); // success(true)면 setShowDialog(false)(끈다는거), 아니라면 아무것도 하지 않겠다(기본이 열려있게 설정해놓음)
   }, [success]);
 
   useEffect(() => {
@@ -72,6 +72,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
     // [["s","3"],["m","4"]] => {s:3. m:4}
     if (mode === "new") {
       //새 상품 만들기
+      dispatch(createProduct({ ...formData, stock: totalStock }));
     } else {
       // 상품 수정하기
     }
