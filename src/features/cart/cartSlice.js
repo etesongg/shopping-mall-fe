@@ -39,7 +39,15 @@ export const addToCart = createAsyncThunk(
 
 export const getCartList = createAsyncThunk(
   "cart/getCartList",
-  async (_, { rejectWithValue, dispatch }) => {}
+  async (_, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await api.get("/cart");
+      if (response.status !== 200) throw new Error(response.message);
+      return response.data.data;
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
+  }
 );
 
 export const deleteCartItem = createAsyncThunk(
@@ -68,6 +76,7 @@ const cartSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // 카트 상품 담기
       .addCase(addToCart.pending, (state, action) => {
         state.loading = true;
       })
@@ -77,6 +86,24 @@ const cartSlice = createSlice({
         state.cartItemCount = action.payload;
       })
       .addCase(addToCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // 카트 보여주기
+      .addCase(getCartList.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getCartList.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = "";
+        state.cartList = action.payload;
+        state.totalPrice = action.payload.reduce(
+          // 많은 곳에서 필요하기 때문에 각 필요한 페이지에서 계산해서 사용하는 것보다 한번 계산해서 가져가 쓰는 게 효율적
+          (total, item) => total + item.productId.price * item.qty,
+          0
+        );
+      })
+      .addCase(getCartList.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

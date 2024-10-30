@@ -79,12 +79,6 @@ export const logout = createAsyncThunk(
   async (_, { dispatch, rejectWithValue }) => {
     try {
       sessionStorage.removeItem("token");
-      dispatch(
-        showToastMessage({
-          message: "로그아웃 되었습니다.",
-          status: "success",
-        })
-      );
     } catch (e) {
       return rejectWithValue(e.message);
     }
