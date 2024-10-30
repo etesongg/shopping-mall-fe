@@ -33,6 +33,7 @@ export const createProduct = createAsyncThunk(
           status: "success",
         })
       );
+      dispatch(getProductList({ page: 1 }));
       return response.data.data;
     } catch (e) {
       return rejectWithValue(e.message);
@@ -42,7 +43,21 @@ export const createProduct = createAsyncThunk(
 
 export const deleteProduct = createAsyncThunk(
   "products/deleteProduct",
-  async (id, { dispatch, rejectWithValue }) => {}
+  async (id, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await api.delete(`/product/${id}`);
+      if (response.status !== 200) throw new Error(response.message);
+      dispatch(
+        showToastMessage({
+          message: "상품 삭제 완료!",
+          status: "success",
+        })
+      );
+      dispatch(getProductList({ page: 1 }));
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
+  }
 );
 
 export const editProduct = createAsyncThunk(
@@ -51,6 +66,7 @@ export const editProduct = createAsyncThunk(
     try {
       const response = await api.put(`/product/${id}`, formData);
       if (response.status !== 200) throw new Error(response.message);
+      dispatch(getProductList({ page: 1 }));
     } catch (e) {
       return rejectWithValue(e.message);
     }
@@ -112,7 +128,9 @@ const productSlice = createSlice({
       .addCase(getProductList.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.success = false;
       })
+      // 상품 수정
       .addCase(editProduct.pending, (state, action) => {
         state.loading = true;
       })
@@ -122,6 +140,20 @@ const productSlice = createSlice({
         state.success = true;
       })
       .addCase(editProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.success = false;
+      })
+      // 상품 삭제
+      .addCase(deleteProduct.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = "";
+        state.success = true;
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
         state.success = false;
