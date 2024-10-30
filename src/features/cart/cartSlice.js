@@ -52,7 +52,16 @@ export const getCartList = createAsyncThunk(
 
 export const deleteCartItem = createAsyncThunk(
   "cart/deleteCartItem",
-  async (id, { rejectWithValue, dispatch }) => {}
+  async (id, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await api.delete(`cart/${id}`);
+      if (response.status !== 200) throw new Error(response.message);
+      dispatch(getCartList());
+      return response.data.cartItemQty;
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
+  }
 );
 
 export const updateQty = createAsyncThunk(
@@ -104,6 +113,20 @@ const cartSlice = createSlice({
         );
       })
       .addCase(getCartList.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // 카트 상품 삭제하기
+      .addCase(deleteCartItem.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(deleteCartItem.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = "";
+        state.cartItemCount = action.payload;
+        console.log(action.payload);
+      })
+      .addCase(deleteCartItem.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
