@@ -44,7 +44,10 @@ export const createProduct = createAsyncThunk(
       dispatch(getProductList({ page: 1 }));
       return response.data.data;
     } catch (e) {
-      return rejectWithValue(e.message);
+      const eMessage = e.message.includes("E11000")
+        ? "Sku already exists."
+        : e.message;
+      return rejectWithValue(eMessage);
     }
   }
 );
