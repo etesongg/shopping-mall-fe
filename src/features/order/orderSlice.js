@@ -20,6 +20,7 @@ export const createOrder = createAsyncThunk(
     try {
       const response = await api.post("/order", payload);
       if (response.status !== 200) throw new Error(response.message);
+      dispatch(getCartQty()); // 주문 후 카트 아이템 수 다시 불러오기
       return response.data.orderNum;
     } catch (e) {
       dispatch(
