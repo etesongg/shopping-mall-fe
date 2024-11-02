@@ -33,7 +33,10 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
   const [stockError, setStockError] = useState(false);
 
   useEffect(() => {
-    if (success) setShowDialog(false); // success(true)면 setShowDialog(false)(끈다는거), 아니라면 아무것도 하지 않겠다(기본이 열려있게 설정해놓음)
+    if (success) {
+      dispatch(clearError());
+      setShowDialog(false);
+    } // success(true)면 setShowDialog(false)(끈다는거), 아니라면 아무것도 하지 않겠다(기본이 열려있게 설정해놓음)
   }, [success]);
 
   useEffect(() => {
@@ -70,11 +73,15 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
     event.preventDefault();
     //재고를 입력했는지 확인, 아니면 에러
     if (stock.length === 0) return setStockError(true);
-    // 재고를 배열에서 객체로 바꿔주기
+    // 재고를 배열에서 객체로 바꿔주기 [["s","3"],["m","4"]] => {s:3. m:4}
     const totalStock = stock.reduce((total, item) => {
-      return { ...total, [item[0]]: parseInt(item[1]) };
+      const qty = parseInt(item[1], 10); // 정수 변환
+      if (isNaN(qty) || qty < 0) {
+        return { ...total, [item[0]]: 0 }; // 유효하지 않으면 0으로 설정
+      }
+      return { ...total, [item[0]]: qty }; // 유효한 수량이면 그대로 설정
     }, {});
-    // [["s","3"],["m","4"]] => {s:3. m:4}
+
     if (mode === "new") {
       //새 상품 만들기
       dispatch(createProduct({ ...formData, stock: totalStock }));

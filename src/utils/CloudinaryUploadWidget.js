@@ -8,21 +8,23 @@ const UPLOADPRESET = process.env.REACT_APP_CLOUDINARY_PRESET;
 
 class CloudinaryUploadWidget extends Component {
   componentDidMount() {
-    var myWidget = window.cloudinary.createUploadWidget(
+    const myWidget = window.cloudinary.createUploadWidget(
       {
         cloudName: CLOUDNAME,
         uploadPreset: UPLOADPRESET,
       },
       (error, result) => {
-        if (!error && result && result.event === "success") {
+        if (error) {
+          console.error("Upload error:", error);
+          return;
+        }
+        if (result && result.event === "success") {
           console.log("Done! Here is the image info: ", result.info);
-          document
-            .getElementById("uploadedimage")
-            .setAttribute("src", result.info.secure_url);
           this.props.uploadImage(result.info.secure_url);
         }
-      } //https://cloudinary.com/documentation/react_image_and_video_upload
+      }
     );
+
     document.getElementById("upload_widget").addEventListener(
       "click",
       function () {
