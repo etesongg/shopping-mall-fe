@@ -77,6 +77,12 @@ export const editProduct = createAsyncThunk(
     try {
       const response = await api.put(`/product/${id}`, formData);
       if (response.status !== 200) throw new Error(response.message);
+      dispatch(
+        showToastMessage({
+          message: "상품 수정 완료!",
+          status: "success",
+        })
+      );
       dispatch(getProductList({ page: 1 }));
     } catch (e) {
       return rejectWithValue(e.message);

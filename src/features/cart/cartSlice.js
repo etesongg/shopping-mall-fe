@@ -26,12 +26,14 @@ export const addToCart = createAsyncThunk(
       );
       return response.data.cartItemQty;
     } catch (e) {
-      dispatch(
-        showToastMessage({
-          message: e.message,
-          status: "error",
-        })
-      );
+      if (e.message !== "invalid token") {
+        dispatch(
+          showToastMessage({
+            message: e.message,
+            status: "error",
+          })
+        );
+      }
       return rejectWithValue(e.message);
     }
   }
