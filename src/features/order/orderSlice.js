@@ -19,7 +19,7 @@ export const createOrder = createAsyncThunk(
   async (payload, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.post("/order", payload);
-      if (response.status !== 200) throw new Error(response.message);
+
       dispatch(getCartQty()); // 주문 후 카트 아이템 수 다시 불러오기
       return response.data.orderNum;
     } catch (e) {
@@ -39,7 +39,7 @@ export const getOrder = createAsyncThunk(
   async (_, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.get("/order/me");
-      if (response.status !== 200) throw new Error(response.message);
+
       return response.data;
     } catch (e) {
       return rejectWithValue(e.message);
@@ -52,7 +52,7 @@ export const getOrderList = createAsyncThunk(
   async (query, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.get("/order", { params: { ...query } });
-      if (response.status !== 200) throw new Error(response.message);
+
       return response.data;
     } catch (e) {
       return rejectWithValue(e.message);
@@ -65,7 +65,7 @@ export const updateOrder = createAsyncThunk(
   async ({ id, status }, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.put(`/order/${id}`, { status });
-      if (response.status !== 200) throw new Error(response.message);
+
       dispatch(getOrderList({ page: 1 }));
     } catch (e) {
       return rejectWithValue(e.message);
