@@ -79,6 +79,7 @@ export const logout = createAsyncThunk(
   async (_, { dispatch, rejectWithValue }) => {
     try {
       sessionStorage.removeItem("token");
+      dispatch(initialCart());
     } catch (e) {
       return rejectWithValue(e.message);
     }
