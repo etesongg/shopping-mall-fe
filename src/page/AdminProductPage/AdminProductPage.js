@@ -10,17 +10,22 @@ import {
   getProductList,
   deleteProduct,
   setSelectedProduct,
+  setItemsPerPage,
 } from "../../features/product/productSlice";
+import ItemCountDropdown from "../../common/component/ItemCountDropdown";
 
 const AdminProductPage = () => {
   const navigate = useNavigate();
   const [query] = useSearchParams();
   const dispatch = useDispatch();
-  const { productList, totalPageNum } = useSelector((state) => state.product);
+  const { productList, totalPageNum, itemsPerPage } = useSelector(
+    (state) => state.product
+  );
   const [showDialog, setShowDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState({
     page: query.get("page") || 1,
     name: query.get("name") || "",
+    itemsPerPage: query.get("itemsPerPage") || itemsPerPage,
   }); //검색 조건들을 저장하는 객체
 
   const [mode, setMode] = useState("new");
@@ -38,8 +43,8 @@ const AdminProductPage = () => {
 
   //상품리스트 가져오기 (url쿼리 맞춰서)
   useEffect(() => {
-    dispatch(getProductList({ ...searchQuery }));
-  }, [query]);
+    dispatch(getProductList({ ...searchQuery, itemsPerPage }));
+  }, [query, itemsPerPage]);
 
   useEffect(() => {
     //검색어나 페이지가 바뀌면 url바꿔주기 (검색어또는 페이지가 바뀜 => url 바꿔줌=> url쿼리 읽어옴=> 이 쿼리값 맞춰서  상품리스트 가져오기)
@@ -79,6 +84,16 @@ const AdminProductPage = () => {
     setSearchQuery({ ...searchQuery, page: selected + 1 });
   };
 
+  const handleItemsPerPageChange = (value) => {
+    dispatch(setItemsPerPage(value));
+    setSearchQuery((prevQuery) => ({
+      ...prevQuery,
+      page: 1,
+      itemsPerPage: value,
+    }));
+    dispatch(getProductList({ ...searchQuery, page: 1, itemsPerPage: value }));
+  };
+
   // searchbox에서 검색어를 읽어온다 => 엔터 => searchQuery객체가 업데이트 됨 {name: 스트레이트 팬츠}
   // => searchQuery객체 안에 아이템 기준으로 url을 새로 생성해서 호출 &name=스트레이츠+팬치
   // => url쿼리 읽어오기 => url쿼리 기준으로 be에 검색조건과 함께 호출한다.
@@ -93,9 +108,15 @@ const AdminProductPage = () => {
             field="name"
           />
         </div>
-        <Button className="mt-2 mb-2" onClick={handleClickNewItem}>
-          Add New Item +
-        </Button>
+        <div>
+          <Button className="mt-2 mb-2" onClick={handleClickNewItem}>
+            Add New Item +
+          </Button>
+          <ItemCountDropdown
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={handleItemsPerPageChange}
+          />
+        </div>
 
         <ProductTable
           header={tableHeader}
